@@ -1,13 +1,38 @@
 #include "object/YsHandle.h"
 #include "object/YsHandleList.h"
+#include "gfl/gflMemoryUtil.h"
+
+// functions not defined in this TU
+
+extern "C" {
+    void fn_02BB6EE4();
+}
 
 void YsHandleList::Set(uint index, YsHandleObj* object) {
-    // not decompiled
+   mObjects[index] = object;
+   object->SetHandleID(mLastHandleID);
+   object->SetHandleObject(&mObjects[index]);
+   mHandleCount = index + 1;
+   mLastHandleID++;
 }
 
-void YsHandleList::Add(YsHandleObj* object) {
-    // not decompiled
-}
+// void YsHandleList::Add(YsHandleObj* object) {
+//     // uint curCount = mHandleCount;
+//     // YsHandleObj** lastHandleObj = &mObjects[mHandleCount];
+    
+//     // while (curCount < YS_HANDLE_LIST_MAX_HANDLES) {
+//     //     if (*lastHandleObj == nullptr) {
+//     //         Set(curCount, object);
+//     //         return;
+//     //     }
+
+//     //     lastHandleObj++;
+//     //     curCount++;
+//     // }
+
+
+
+// }
 
 YsHandleObj::YsHandleObj() {
     mHandle.SetObject(nullptr);
@@ -23,12 +48,15 @@ YsHandleObj::~YsHandleObj() {
     YsHandleList::Instance()->Remove(this);
 }
 
-YsHandleList::YsHandleList() {
-    // not decompiled
+YsHandleList::YsHandleList()
+    : mHandleCount(0)
+    , mLastHandleID(1)
+{
+    gfl::Memset(mObjects, 0, 0x1F40);
 }
 
 void YsHandleList::InitInstance() {
-    sInstance = new (1) YsHandleObj();
+    sInstance = new (1) YsHandleList;
 }
 
 YsHandleList::~YsHandleList() { }
